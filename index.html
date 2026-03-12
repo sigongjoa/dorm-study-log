@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>기숙사 학습 다이어리</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .fade-in { animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    textarea:focus, input:focus { outline: none; }
+    .image-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .image-preview img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- ============================
+     화면 전환 네비 (개발용)
+============================= -->
+<div class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 flex overflow-x-auto text-xs">
+  <button onclick="show('login')" class="px-3 py-2 whitespace-nowrap text-gray-500 hover:text-blue-600">로그인</button>
+  <button onclick="show('student-home')" class="px-3 py-2 whitespace-nowrap text-gray-500 hover:text-blue-600">학생-홈</button>
+  <button onclick="show('student-write')" class="px-3 py-2 whitespace-nowrap text-gray-500 hover:text-blue-600">학생-기록</button>
+  <button onclick="show('student-detail')" class="px-3 py-2 whitespace-nowrap text-gray-500 hover:text-blue-600">학생-상세</button>
+  <button onclick="show('teacher-feed')" class="px-3 py-2 whitespace-nowrap text-gray-500 hover:text-blue-600">선생님-피드</button>
+  <button onclick="show('teacher-detail')" class="px-3 py-2 whitespace-nowrap text-gray-500 hover:text-blue-600">선생님-상세</button>
+  <button onclick="show('teacher-report')" class="px-3 py-2 whitespace-nowrap text-gray-500 hover:text-blue-600">리포트</button>
+</div>
+
+<div class="pt-9">
+
+<!-- ============================
+     1. 로그인
+============================= -->
+<div id="screen-login" class="screen active fade-in max-w-sm mx-auto px-6 py-16">
+  <div class="text-center mb-10">
+    <div class="text-4xl mb-3">📚</div>
+    <h1 class="text-2xl font-bold text-gray-900">학습 다이어리</h1>
+    <p class="text-gray-400 text-sm mt-1">기숙사 수학 학습 기록</p>
+  </div>
+  <div class="space-y-3">
+    <input type="email" placeholder="이메일" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm" />
+    <input type="password" placeholder="비밀번호" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm" />
+    <button onclick="show('student-home')" class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-sm transition">학생으로 로그인</button>
+    <button onclick="show('teacher-feed')" class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-xl text-sm transition">선생님으로 로그인</button>
+  </div>
+</div>
+
+<!-- ============================
+     2. 학생 홈 (내 기록 피드)
+============================= -->
+<div id="screen-student-home" class="screen fade-in max-w-sm mx-auto">
+  <!-- 헤더 -->
+  <div class="sticky top-9 bg-white border-b border-gray-100 px-5 py-4 flex items-center justify-between z-10">
+    <div>
+      <p class="text-xs text-gray-400">안녕하세요</p>
+      <h2 class="text-lg font-bold text-gray-900">김민준님의 기록</h2>
+    </div>
+    <button onclick="show('student-write')" class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition">
+      + 기록하기
+    </button>
+  </div>
+
+  <!-- 기록 목록 -->
+  <div class="px-5 py-4 space-y-4">
+
+    <!-- 오늘 기록 (코멘트 있음) -->
+    <div onclick="show('student-detail')" class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm cursor-pointer active:bg-gray-50 transition">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-medium text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">오늘</span>
+        <span class="text-xs text-gray-400">2026.03.13</span>
+      </div>
+      <p class="text-sm text-gray-700 leading-relaxed line-clamp-3">
+        오늘 수열 극한 파트 공부했는데 수열의 극한값 구하는 건 되는데 극한의 대소 관계 증명 부분이 잘 이해가 안 됨. 샌드위치 정리 개념은 알겠는데 실제로 적용이 안 되는 느낌.
+      </p>
+      <div class="flex items-center gap-2 mt-3">
+        <div class="flex -space-x-1">
+          <div class="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden">
+            <img src="https://placehold.co/56x56/e5e7eb/9ca3af?text=풀이" class="w-full h-full object-cover" />
+          </div>
+          <div class="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden">
+            <img src="https://placehold.co/56x56/e5e7eb/9ca3af?text=오답" class="w-full h-full object-cover" />
+          </div>
+        </div>
+        <div class="ml-auto flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+          <span>💬</span>
+          <span>선생님 코멘트</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 이전 기록 -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm cursor-pointer active:bg-gray-50 transition">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs text-gray-400">3일 전</span>
+        <span class="text-xs text-gray-400">2026.03.10</span>
+      </div>
+      <p class="text-sm text-gray-700 leading-relaxed line-clamp-3">
+        미분 복습. 합성함수 미분이랑 역함수 미분 위주로 봤음. 문제는 풀리는데 시간이 너무 오래 걸림. 특히 분수 함수 미분할 때 실수가 자꾸 남.
+      </p>
+      <div class="mt-3 flex justify-end">
+        <span class="text-xs text-gray-400">코멘트 없음</span>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm cursor-pointer active:bg-gray-50 transition">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs text-gray-400">5일 전</span>
+        <span class="text-xs text-gray-400">2026.03.08</span>
+      </div>
+      <p class="text-sm text-gray-700 leading-relaxed line-clamp-3">
+        적분 기초. 치환적분이랑 부분적분 개념 다시 정리함. 부분적분 순서 외우는 게 헷갈려서 LIATE 규칙 외웠는데 막상 쓰려니 또 헷갈림.
+      </p>
+      <div class="flex items-center gap-2 mt-3">
+        <div class="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden">
+          <img src="https://placehold.co/56x56/e5e7eb/9ca3af?text=노트" class="w-full h-full object-cover" />
+        </div>
+        <div class="ml-auto flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+          <span>💬</span>
+          <span>선생님 코멘트</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="h-8"></div>
+  </div>
+</div>
+
+<!-- ============================
+     3. 학생 기록 작성
+============================= -->
+<div id="screen-student-write" class="screen fade-in max-w-sm mx-auto">
+  <div class="sticky top-9 bg-white border-b border-gray-100 px-5 py-4 flex items-center gap-3 z-10">
+    <button onclick="show('student-home')" class="text-gray-400 text-xl">←</button>
+    <h2 class="text-lg font-bold text-gray-900">오늘의 기록</h2>
+  </div>
+
+  <div class="px-5 py-5 space-y-5">
+    <!-- 날짜 -->
+    <div class="text-sm text-gray-400">2026년 3월 13일 목요일</div>
+
+    <!-- 텍스트 입력 -->
+    <div>
+      <label class="text-sm font-medium text-gray-700 block mb-2">오늘 뭐 공부했어요?</label>
+      <textarea
+        id="log-text"
+        rows="7"
+        placeholder="자유롭게 써줘요.
+예) 오늘 수열 극한 공부했는데 샌드위치 정리가 어려웠음. 교재 p.134 3번 문제 계속 틀림..."
+        class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm leading-relaxed resize-none focus:border-blue-400 transition"
+      ></textarea>
+    </div>
+
+    <!-- 이미지 업로드 -->
+    <div>
+      <label class="text-sm font-medium text-gray-700 block mb-2">사진 첨부 (선택)</label>
+      <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-blue-300 hover:bg-blue-50 transition">
+        <span class="text-2xl mb-1">📷</span>
+        <span class="text-xs text-gray-400">풀이 노트, 오답 사진 등</span>
+        <input type="file" accept="image/*" multiple class="hidden" onchange="previewImages(this)" />
+      </label>
+      <div id="preview-container" class="image-preview"></div>
+    </div>
+
+    <!-- 제출 -->
+    <button onclick="submitLog()" class="w-full py-3.5 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-sm transition">
+      기록 저장하기
+    </button>
+  </div>
+</div>
+
+<!-- ============================
+     4. 학생 기록 상세 (코멘트 포함)
+============================= -->
+<div id="screen-student-detail" class="screen fade-in max-w-sm mx-auto">
+  <div class="sticky top-9 bg-white border-b border-gray-100 px-5 py-4 flex items-center gap-3 z-10">
+    <button onclick="show('student-home')" class="text-gray-400 text-xl">←</button>
+    <div>
+      <h2 class="text-base font-bold text-gray-900">2026년 3월 13일</h2>
+      <p class="text-xs text-gray-400">수요일</p>
+    </div>
+  </div>
+
+  <div class="px-5 py-5 space-y-5">
+    <!-- 내 기록 -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+      <p class="text-xs text-gray-400 mb-2">내 기록</p>
+      <p class="text-sm text-gray-800 leading-relaxed">
+        오늘 수열 극한 파트 공부했는데 수열의 극한값 구하는 건 되는데 극한의 대소 관계 증명 부분이 잘 이해가 안 됨. 샌드위치 정리 개념은 알겠는데 실제로 적용이 안 되는 느낌. 내일 다시 풀어볼 예정.
+      </p>
+      <!-- 이미지 -->
+      <div class="flex gap-2 mt-3">
+        <img src="https://placehold.co/100x100/f3f4f6/6b7280?text=풀이1" class="w-20 h-20 rounded-xl object-cover" />
+        <img src="https://placehold.co/100x100/f3f4f6/6b7280?text=오답" class="w-20 h-20 rounded-xl object-cover" />
+      </div>
+    </div>
+
+    <!-- 선생님 코멘트 -->
+    <div>
+      <p class="text-xs font-medium text-gray-400 mb-3">선생님 코멘트</p>
+      <div class="flex gap-3">
+        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm flex-shrink-0">👨‍🏫</div>
+        <div class="bg-blue-50 rounded-2xl rounded-tl-none px-4 py-3 flex-1">
+          <p class="text-xs font-semibold text-blue-700 mb-1">박선생님</p>
+          <p class="text-sm text-gray-700 leading-relaxed">
+            샌드위치 정리는 부등식을 "조이는" 느낌으로 접근하면 돼. f(n) ≤ g(n) ≤ h(n) 에서 f, h 극한이 같으면 g도 같다는 거거든. 내일 수업 때 예제 같이 풀어보자. 사진 보니까 풀이 흐름은 맞는데 마지막 부등호 방향이 틀렸어!
+          </p>
+          <p class="text-xs text-gray-400 mt-2">2026.03.13 오후 8:42</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     5. 선생님 피드
+============================= -->
+<div id="screen-teacher-feed" class="screen fade-in max-w-sm mx-auto">
+  <div class="sticky top-9 bg-white border-b border-gray-100 px-5 py-4 z-10">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-bold text-gray-900">학습 피드</h2>
+      <button onclick="show('teacher-report')" class="text-xs text-gray-500 border border-gray-200 px-3 py-1.5 rounded-lg">리포트 생성</button>
+    </div>
+    <!-- 학생 필터 -->
+    <div class="flex gap-2 overflow-x-auto pb-1">
+      <button onclick="filterStudent(this, 'all')" class="filter-btn whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-blue-500 text-white font-medium">전체</button>
+      <button onclick="filterStudent(this, '김민준')" class="filter-btn whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">김민준</button>
+      <button onclick="filterStudent(this, '이서연')" class="filter-btn whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">이서연</button>
+      <button onclick="filterStudent(this, '박도현')" class="filter-btn whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600">박도현</button>
+    </div>
+  </div>
+
+  <div class="px-5 py-4 space-y-4">
+
+    <div onclick="show('teacher-detail')" class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm cursor-pointer hover:border-blue-200 transition">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-7 h-7 rounded-full bg-blue-100 text-xs flex items-center justify-center font-bold text-blue-600">민</div>
+        <span class="text-sm font-semibold text-gray-800">김민준</span>
+        <span class="ml-auto text-xs text-gray-400">오늘 오후 5:30</span>
+      </div>
+      <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">
+        수열 극한 파트 공부했는데 극한의 대소 관계 증명 부분이 잘 이해가 안 됨. 샌드위치 정리 개념은 알겠는데 실제로 적용이 안 되는 느낌.
+      </p>
+      <div class="flex items-center gap-2 mt-3">
+        <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
+          <img src="https://placehold.co/40x40/e5e7eb/9ca3af?text=사진" class="w-full h-full object-cover"/>
+        </div>
+        <span class="ml-auto text-xs text-red-400 bg-red-50 px-2 py-0.5 rounded-full">미응답</span>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm cursor-pointer hover:border-blue-200 transition">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-7 h-7 rounded-full bg-rose-100 text-xs flex items-center justify-center font-bold text-rose-600">서</div>
+        <span class="text-sm font-semibold text-gray-800">이서연</span>
+        <span class="ml-auto text-xs text-gray-400">오늘 오후 4:10</span>
+      </div>
+      <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">
+        오늘 확률 공부. 조합이랑 순열은 이제 확실히 하는데 중복조합이 아직도 헷갈림. n+r-1Cr 공식은 외웠는데 어떨 때 쓰는지 감이 잘 안 옴.
+      </p>
+      <div class="mt-3 flex justify-end">
+        <span class="text-xs text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-full">답변 완료</span>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm cursor-pointer hover:border-blue-200 transition">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-7 h-7 rounded-full bg-amber-100 text-xs flex items-center justify-center font-bold text-amber-600">도</div>
+        <span class="text-sm font-semibold text-gray-800">박도현</span>
+        <span class="ml-auto text-xs text-gray-400">어제 오후 9:20</span>
+      </div>
+      <p class="text-sm text-gray-600 leading-relaxed line-clamp-3">
+        벡터 내적 공부. cos θ 관계식은 이해했는데 벡터 분해에서 자꾸 막힘. 특히 3차원으로 넘어가면 머릿속에서 그림이 안 그려짐.
+      </p>
+      <div class="flex items-center gap-2 mt-3">
+        <div class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden">
+          <img src="https://placehold.co/40x40/e5e7eb/9ca3af?text=사진" class="w-full h-full object-cover"/>
+        </div>
+        <span class="ml-auto text-xs text-red-400 bg-red-50 px-2 py-0.5 rounded-full">미응답</span>
+      </div>
+    </div>
+
+    <div class="h-8"></div>
+  </div>
+</div>
+
+<!-- ============================
+     6. 선생님 - 기록 상세 + 코멘트 작성
+============================= -->
+<div id="screen-teacher-detail" class="screen fade-in max-w-sm mx-auto">
+  <div class="sticky top-9 bg-white border-b border-gray-100 px-5 py-4 flex items-center gap-3 z-10">
+    <button onclick="show('teacher-feed')" class="text-gray-400 text-xl">←</button>
+    <div>
+      <h2 class="text-base font-bold text-gray-900">김민준 · 3월 13일</h2>
+      <p class="text-xs text-gray-400">기록 상세</p>
+    </div>
+  </div>
+
+  <div class="px-5 py-5 space-y-5">
+    <!-- 학생 기록 -->
+    <div class="bg-gray-50 rounded-2xl p-4">
+      <p class="text-xs text-gray-400 mb-2">학생 기록</p>
+      <p class="text-sm text-gray-800 leading-relaxed">
+        오늘 수열 극한 파트 공부했는데 수열의 극한값 구하는 건 되는데 극한의 대소 관계 증명 부분이 잘 이해가 안 됨. 샌드위치 정리 개념은 알겠는데 실제로 적용이 안 되는 느낌. 내일 다시 풀어볼 예정.
+      </p>
+      <div class="flex gap-2 mt-3">
+        <img src="https://placehold.co/100x100/f3f4f6/6b7280?text=풀이1" class="w-20 h-20 rounded-xl object-cover" />
+        <img src="https://placehold.co/100x100/f3f4f6/6b7280?text=오답" class="w-20 h-20 rounded-xl object-cover" />
+      </div>
+    </div>
+
+    <!-- 코멘트 입력 -->
+    <div>
+      <p class="text-sm font-medium text-gray-700 mb-2">코멘트 작성</p>
+      <textarea
+        id="comment-text"
+        rows="5"
+        placeholder="학생에게 피드백을 남겨주세요."
+        class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm leading-relaxed resize-none focus:border-blue-400 transition"
+      >샌드위치 정리는 부등식을 "조이는" 느낌으로 접근하면 돼. f(n) ≤ g(n) ≤ h(n) 에서 f, h 극한이 같으면 g도 같다는 거거든. 내일 수업 때 예제 같이 풀어보자. 사진 보니까 풀이 흐름은 맞는데 마지막 부등호 방향이 틀렸어!</textarea>
+      <button onclick="submitComment()" class="w-full mt-2 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-sm transition">
+        코멘트 전송
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     7. 리포트 생성
+============================= -->
+<div id="screen-teacher-report" class="screen fade-in max-w-sm mx-auto">
+  <div class="sticky top-9 bg-white border-b border-gray-100 px-5 py-4 flex items-center gap-3 z-10">
+    <button onclick="show('teacher-feed')" class="text-gray-400 text-xl">←</button>
+    <h2 class="text-lg font-bold text-gray-900">리포트 생성</h2>
+  </div>
+
+  <div class="px-5 py-5 space-y-5">
+    <!-- 학생 선택 -->
+    <div>
+      <label class="text-sm font-medium text-gray-700 block mb-2">학생 선택</label>
+      <select class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 transition">
+        <option>전체 학생</option>
+        <option selected>김민준</option>
+        <option>이서연</option>
+        <option>박도현</option>
+      </select>
+    </div>
+
+    <!-- 기간 -->
+    <div>
+      <label class="text-sm font-medium text-gray-700 block mb-2">기간</label>
+      <div class="flex gap-2 items-center">
+        <input type="date" value="2026-03-01" class="flex-1 px-3 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 transition" />
+        <span class="text-gray-400 text-sm">~</span>
+        <input type="date" value="2026-03-13" class="flex-1 px-3 py-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 transition" />
+      </div>
+    </div>
+
+    <!-- 포함 내용 -->
+    <div>
+      <label class="text-sm font-medium text-gray-700 block mb-2">포함 내용</label>
+      <div class="space-y-2">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked class="w-4 h-4 rounded text-blue-500" />
+          <span class="text-sm text-gray-700">학생 기록 전문</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked class="w-4 h-4 rounded text-blue-500" />
+          <span class="text-sm text-gray-700">선생님 코멘트</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked class="w-4 h-4 rounded text-blue-500" />
+          <span class="text-sm text-gray-700">첨부 이미지</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 생성 버튼 -->
+    <button onclick="generateReport()" class="w-full py-3.5 bg-gray-900 hover:bg-black text-white font-semibold rounded-xl text-sm transition">
+      PDF 리포트 생성
+    </button>
+
+    <!-- 생성 이력 -->
+    <div>
+      <p class="text-sm font-medium text-gray-700 mb-3">생성 이력</p>
+      <div class="space-y-3">
+        <div id="report-item-1" class="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3">
+          <div class="text-2xl">📄</div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-800">김민준 · 3월 1~13일</p>
+            <p class="text-xs text-gray-400">2026.03.13 생성</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <button onclick="downloadPDF()" class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">다운로드</button>
+            <button onclick="sendKakao(this)" class="text-xs text-yellow-700 bg-yellow-50 px-2 py-1 rounded-lg">카카오 전송</button>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-3">
+          <div class="text-2xl">📄</div>
+          <div class="flex-1">
+            <p class="text-sm font-medium text-gray-800">이서연 · 2월 전체</p>
+            <p class="text-xs text-gray-400">2026.03.01 생성</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <button class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">다운로드</button>
+            <button class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-lg">전송 완료</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="h-8"></div>
+  </div>
+</div>
+
+</div><!-- /pt-9 -->
+
+<!-- 토스트 -->
+<div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-sm px-5 py-3 rounded-full shadow-lg z-50 transition"></div>
+
+<script>
+function show(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('screen-' + name);
+  if (target) {
+    target.classList.add('active');
+    target.classList.remove('fade-in');
+    void target.offsetWidth;
+    target.classList.add('fade-in');
+    window.scrollTo(0, 0);
+  }
+}
+
+function toast(msg, duration = 2000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), duration);
+}
+
+function previewImages(input) {
+  const container = document.getElementById('preview-container');
+  container.innerHTML = '';
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.className = 'w-20 h-20 object-cover rounded-xl';
+      container.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function submitLog() {
+  const text = document.getElementById('log-text').value.trim();
+  if (!text) { toast('공부 내용을 입력해주세요.'); return; }
+  toast('기록이 저장되었어요!');
+  setTimeout(() => show('student-home'), 1200);
+}
+
+function submitComment() {
+  const text = document.getElementById('comment-text').value.trim();
+  if (!text) { toast('코멘트를 입력해주세요.'); return; }
+  toast('코멘트가 전송되었어요!');
+  setTimeout(() => show('teacher-feed'), 1200);
+}
+
+function generateReport() {
+  const btn = event.target;
+  btn.textContent = '생성 중...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = 'PDF 리포트 생성';
+    btn.disabled = false;
+    toast('PDF가 생성되었어요!');
+  }, 1800);
+}
+
+function downloadPDF() {
+  toast('PDF를 다운로드합니다.');
+}
+
+function sendKakao(btn) {
+  btn.textContent = '전송 중...';
+  setTimeout(() => {
+    btn.textContent = '전송 완료';
+    btn.className = 'text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-lg';
+    toast('학부모님께 카카오톡이 전송되었어요!');
+  }, 1500);
+}
+
+function filterStudent(btn, name) {
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.className = 'filter-btn whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-600';
+  });
+  btn.className = 'filter-btn whitespace-nowrap text-xs px-3 py-1.5 rounded-full bg-blue-500 text-white font-medium';
+}
+</script>
+
+</body>
+</html>
