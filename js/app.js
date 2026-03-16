@@ -459,11 +459,16 @@ async function loadTeacherFeed(filter) {
   const listEl = document.getElementById('teacher-feed-list');
   listEl.innerHTML = '<div class="text-center py-10 text-gray-400 text-sm">불러오는 중...</div>';
 
-  // 담당 학생 목록
-  const { data: myStudents } = await supabase
+  // 담당 학생 목록 (students_id_fkey로 FK 명시 - students→profiles FK가 2개라 ambiguity 방지)
+  const { data: myStudents, error: studentsError } = await supabase
     .from('students')
-    .select('id, profiles(name)')
+    .select('id, profiles!students_id_fkey(name)')
     .eq('teacher_id', currentUser.id);
+
+  if (studentsError) {
+    listEl.innerHTML = `<div class="text-center py-16 text-red-400 text-sm">학생 목록 오류: ${escapeHtml(studentsError.message)}</div>`;
+    return;
+  }
 
   renderStudentFilters(myStudents ?? []);
 
@@ -645,7 +650,7 @@ async function loadReportScreen() {
 
   const { data: myStudents } = await supabase
     .from('students')
-    .select('id, profiles(name)')
+    .select('id, profiles!students_id_fkey(name)')
     .eq('teacher_id', currentUser.id);
 
   const selectEl = document.getElementById('report-student-select');
