@@ -409,7 +409,8 @@ async function loadStudentDetail(logId) {
   imagesEl.innerHTML = (log.image_urls || []).map(url =>
     `<img src="${escapeHtml(url)}"
           class="w-20 h-20 rounded-xl object-cover cursor-pointer border border-gray-100"
-          onclick="openImage('${escapeHtml(url)}')"
+          data-img-url="${escapeHtml(url)}"
+          onclick="openImage(this.dataset.imgUrl)"
           loading="lazy"
           onerror="this.style.display='none'" />`
   ).join('');
@@ -436,6 +437,8 @@ async function loadStudentDetail(logId) {
 // 이미지 오버레이
 // ============================================================
 function openImage(url) {
+  // Supabase Storage URL 또는 data: URL만 허용
+  if (!url.startsWith(SUPABASE_URL + '/storage/') && !url.startsWith('data:image/')) return;
   const overlay = document.getElementById('image-overlay');
   document.getElementById('overlay-img').src = url;
   overlay.classList.remove('hidden');
@@ -578,7 +581,8 @@ async function loadTeacherDetail(logId) {
   imagesEl.innerHTML = (log.image_urls || []).map(url =>
     `<img src="${escapeHtml(url)}"
           class="w-20 h-20 rounded-xl object-cover cursor-pointer border border-gray-100"
-          onclick="openImage('${escapeHtml(url)}')"
+          data-img-url="${escapeHtml(url)}"
+          onclick="openImage(this.dataset.imgUrl)"
           loading="lazy"
           onerror="this.style.display='none'" />`
   ).join('');
